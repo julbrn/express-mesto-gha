@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 const getCards = (req, res) => Card.find({})
