@@ -8,11 +8,14 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'NotFound') {
+    .then((user) => {
+      if (!user) {
         res.status(404).send({ message: 'Пользователь с указанным id не найден.' });
-      } else if (err.name === 'CastError') {
+      }
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы не корректные данные' });
       } else {
         res.status(500).send({ message: 'Неизвестная ошибка сервера' });
