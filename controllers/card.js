@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const { NotFoundError } = require('../errors/notFoundError');
 
 const getCards = (req, res) => Card.find({})
   .then((cards) => res.send(cards))
@@ -20,6 +21,7 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail(new NotFoundError())
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'NotFound') {
@@ -37,7 +39,7 @@ const likeCard = (req, res) => {
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  )
+  ).orFail(new NotFoundError())
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Передан несуществующий id карточки' });
@@ -58,7 +60,7 @@ const dislikeCard = (req, res) => {
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
-  )
+  ).orFail(new NotFoundError())
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Передан несуществующий id карточки' });
