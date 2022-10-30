@@ -3,7 +3,7 @@ const { NotFoundError } = require('../errors/notFoundError');
 const {
   SERVER_ERROR_MESSAGE,
   INCORRECT_DATA_MESSAGE,
-  NONEXISTENT_CARD_MESSAGE
+  NONEXISTENT_CARD_MESSAGE,
 } = require('../utils/utils');
 
 const getCards = (req, res) => Card.find({})

@@ -8,7 +8,7 @@ const {
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ users }))
-    .catch((err) => res.status(500).send({ message: SERVER_ERROR_MESSAGE }));
+    .catch(() => res.status(500).send({ message: SERVER_ERROR_MESSAGE }));
 };
 
 const getUserById = (req, res) => {
