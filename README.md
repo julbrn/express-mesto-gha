@@ -22,6 +22,10 @@
   
 Остальные директории вспомогательные, создаются при необходимости разработчиком
 
+## Установка
+
+Склонируйте проект по HTTPS: https://github.com/julbrn/express-mesto-gha.git или через SSH: git@github.com:julbrn/express-mesto-gha.git;
+
 ## Запуск проекта
 
 `npm run start` — запускает сервер   

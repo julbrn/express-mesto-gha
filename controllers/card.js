@@ -1,9 +1,14 @@
 const Card = require('../models/card');
 const { NotFoundError } = require('../errors/notFoundError');
+const {
+  SERVER_ERROR_MESSAGE,
+  INCORRECT_DATA_MESSAGE,
+  NONEXISTENT_CARD_MESSAGE
+} = require('../utils/utils');
 
 const getCards = (req, res) => Card.find({})
   .then((cards) => res.send(cards))
-  .catch(() => res.status(500).send({ message: 'Неизвестная ошибка сервера' }));
+  .catch(() => res.status(500).send({ message: SERVER_ERROR_MESSAGE }));
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -12,9 +17,9 @@ const createCard = (req, res) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы не корректные данные' });
+        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(500).send({ message: 'Неизвестная ошибка сервера' });
+        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -25,11 +30,11 @@ const deleteCard = (req, res) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+        res.status(404).send({ message: NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
+        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(500).send({ message: 'Неизвестная ошибка сервера' });
+        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -43,11 +48,11 @@ const likeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(404).send({ message: 'Переданы некорректные данные для постановки лайка' });
+        res.status(404).send({ message: NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
+        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
       }
-      res.status(500).send({ message: 'Неизвестная ошибка сервера' });
+      res.status(500).send({ message: SERVER_ERROR_MESSAGE });
     });
 };
 const dislikeCard = (req, res) => {
@@ -59,11 +64,11 @@ const dislikeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(404).send({ message: 'Переданы некорректные данные для удаления лайка' });
+        res.status(404).send({ message: NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
+        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
       }
-      res.status(500).send({ message: 'Неизвестная ошибка сервера' });
+      res.status(500).send({ message: SERVER_ERROR_MESSAGE });
     });
 };
 module.exports = {
