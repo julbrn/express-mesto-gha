@@ -45,14 +45,15 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).orFail(new NotFoundError())
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'NotFound') {
         res.status(404).send({ message: NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
+      } else {
+        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
       }
-      res.status(500).send({ message: SERVER_ERROR_MESSAGE });
     });
 };
 const dislikeCard = (req, res) => {
@@ -67,8 +68,9 @@ const dislikeCard = (req, res) => {
         res.status(404).send({ message: NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
+      } else {
+        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
       }
-      res.status(500).send({ message: SERVER_ERROR_MESSAGE });
     });
 };
 module.exports = {
