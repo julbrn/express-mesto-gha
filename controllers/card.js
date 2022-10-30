@@ -27,7 +27,7 @@ const deleteCard = (req, res) => {
       if (err.name === 'NotFound') {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы не корректные данные' });
+        res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: 'Неизвестная ошибка сервера' });
       }
@@ -40,17 +40,12 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).orFail(new NotFoundError())
-    .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Передан несуществующий id карточки' });
-        return;
-      }
-      res.send(card);
-    })
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
-        return;
+      if (err.name === 'NotFound') {
+        res.status(404).send({ message: 'Переданы некорректные данные для постановки лайка' });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
       }
       res.status(500).send({ message: 'Неизвестная ошибка сервера' });
     });
@@ -61,17 +56,12 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   ).orFail(new NotFoundError())
-    .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Передан несуществующий id карточки' });
-        return;
-      }
-      res.send(card);
-    })
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные для снятии лайка' });
-        return;
+      if (err.name === 'NotFound') {
+        res.status(404).send({ message: 'Переданы некорректные данные для удаления лайка' });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
       }
       res.status(500).send({ message: 'Неизвестная ошибка сервера' });
     });
