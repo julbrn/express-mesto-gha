@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const usersRoute = require('./routes/users');
 const cardsRoute = require('./routes/cards');
+const { NOTFOUND_CODE } = require('./utils/utils');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -23,7 +24,7 @@ app.use((req, res, next) => {
 app.use('/', usersRoute);
 app.use('/', cardsRoute);
 app.use((req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+  res.status(NOTFOUND_CODE).send({ message: 'Запрашиваемый ресурс не найден' });
 });
 
 app.listen(PORT, () => {

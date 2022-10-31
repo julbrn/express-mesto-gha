@@ -3,12 +3,15 @@ const { NotFoundError } = require('../errors/notFoundError');
 const {
   SERVER_ERROR_MESSAGE,
   INCORRECT_DATA_MESSAGE,
+  SERVER_ERROR_CODE,
+  INCORRECT_DATA_CODE,
+  NOTFOUND_CODE,
 } = require('../utils/utils');
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ users }))
-    .catch(() => res.status(500).send({ message: SERVER_ERROR_MESSAGE }));
+    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE }));
 };
 
 const getUserById = (req, res) => {
@@ -17,11 +20,11 @@ const getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(404).send({ message: 'Пользователь с указанным id не найден.' });
+        res.status(NOTFOUND_CODE).send({ message: 'Пользователь с указанным id не найден.' });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -35,9 +38,9 @@ const createUser = (req, res) => {
     .then((user) => res.status(200).send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -49,11 +52,11 @@ const updateProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным id не найден' });
+        res.status(NOTFOUND_CODE).send({ message: 'Пользователь с указанным id не найден' });
       } else {
-        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -67,11 +70,11 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным id не найден' });
+        res.status(NOTFOUND_CODE).send({ message: 'Пользователь с указанным id не найден' });
       } else {
-        res.status(500).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
       }
     });
 };
