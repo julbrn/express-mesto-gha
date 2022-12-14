@@ -1,7 +1,11 @@
+require('dotenv').config();
+
+const { NODE_ENV, SECRET_KEY } = process.env;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { NotFoundError } = require('../errors/notFoundError');
+const { UnauthorizedError } = require('../errors/unauthorizedError');
 const { STATUS_CODE } = require('../utils/STATUS_CODE');
 const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
 
@@ -43,7 +47,15 @@ const createUser = (req, res) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(200).send({ user }))
+    .then((user) => res.status(201).send({
+      data: {
+        _id: user._id,
+        name,
+        about,
+        avatar,
+        email,
+      },
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(STATUS_CODE.INCORRECT_DATA_CODE)
@@ -100,6 +112,20 @@ const updateAvatar = (req, res) => {
     });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password, res)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? SECRET_KEY : 'dev-secret', { expiresIn: '7d' });
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        sameSite: true,
+      })
+        .status(200).send({ token });
+    })
+    .catch(() => new UnauthorizedError(STATUS_MESSAGE.WRONG_LOGIN_DATA_MESSAGE));
+};
+
 module.exports = {
-  getUsers, getUserById, createUser, updateProfile, updateAvatar,
+  getUsers, getUserById, createUser, updateProfile, updateAvatar, login,
 };
