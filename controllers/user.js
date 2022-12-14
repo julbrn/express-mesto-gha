@@ -13,7 +13,6 @@ const getUsers = (req, res) => {
     .then((users) => res.send({ users }))
     .catch(() => res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE }));
 };
-
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
     .orFail(new NotFoundError())
