@@ -1,0 +1,9 @@
+const STATUS_CODE = {
+  SERVER_ERROR_CODE: 500,
+  INCORRECT_DATA_CODE: 400,
+  NOTFOUND_CODE: 404,
+};
+
+module.exports = {
+  STATUS_CODE,
+};

@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const usersRoute = require('./routes/users');
 const cardsRoute = require('./routes/cards');
-const { NOTFOUND_CODE } = require('./utils/utils');
+const { NOTFOUND_CODE } = require('./utils/STATUS_CODE');
 
 const { PORT = 3000 } = process.env;
 const app = express();

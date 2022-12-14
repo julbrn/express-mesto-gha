@@ -1,17 +1,13 @@
 const User = require('../models/user');
 const { NotFoundError } = require('../errors/notFoundError');
-const {
-  SERVER_ERROR_MESSAGE,
-  INCORRECT_DATA_MESSAGE,
-  SERVER_ERROR_CODE,
-  INCORRECT_DATA_CODE,
-  NOTFOUND_CODE,
-} = require('../utils/utils');
+const { STATUS_CODE } = require('../utils/STATUS_CODE');
+const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ users }))
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE }));
+    .catch(() => res.status(STATUS_CODE.SERVER_ERROR_CODE)
+      .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE }));
 };
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
@@ -19,11 +15,16 @@ const getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(NOTFOUND_CODE).send({ message: 'Пользователь с указанным id не найден.' });
+        res.status(STATUS_CODE.NOTFOUND_CODE).send({
+          message: 'Пользователь с указанным id не'
+            + ' найден.',
+        });
       } else if (err.name === 'CastError') {
-        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(STATUS_CODE.SERVER_ERROR_CODE)
+          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -37,9 +38,11 @@ const createUser = (req, res) => {
     .then((user) => res.status(200).send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else {
-        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(STATUS_CODE.SERVER_ERROR_CODE)
+          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -51,11 +54,16 @@ const updateProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(NOTFOUND_CODE).send({ message: 'Пользователь с указанным id не найден' });
+        res.status(STATUS_CODE.NOTFOUND_CODE).send({
+          message: 'Пользователь с указанным id не'
+            + ' найден',
+        });
       } else {
-        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(STATUS_CODE.SERVER_ERROR_CODE)
+          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
       }
     });
 };
@@ -69,11 +77,17 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(INCORRECT_DATA_CODE).send({ message: INCORRECT_DATA_MESSAGE });
+        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(NOTFOUND_CODE).send({ message: 'Пользователь с указанным id не найден' });
+        res.status(STATUS_CODE.NOTFOUND_CODE)
+          .send({
+            message: 'Пользователь с указанным id не'
+              + ' найден',
+          });
       } else {
-        res.status(SERVER_ERROR_CODE).send({ message: SERVER_ERROR_MESSAGE });
+        res.status(STATUS_CODE.SERVER_ERROR_CODE)
+          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
       }
     });
 };
