@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { isEmail, isURL } = require('validator');
 const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
+const { UnauthorizedError } = require('../errors/unauthorizedError');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -47,19 +48,17 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password, res) {
+userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {
   return this.findOne({ email })
     .select('+password')
     .then((user) => {
       if (!user) {
-        res.status(401)
-          .send({ message: STATUS_MESSAGE.WRONG_LOGIN_DATA_MESSAGE });
+        return Promise.reject(new UnauthorizedError(STATUS_MESSAGE.WRONG_LOGIN_DATA_MESSAGE));
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            res.status(401)
-              .send({ message: STATUS_MESSAGE.WRONG_LOGIN_DATA_MESSAGE });
+            return Promise.reject(new UnauthorizedError(STATUS_MESSAGE.WRONG_LOGIN_DATA_MESSAGE));
           }
           return user;
         });

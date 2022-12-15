@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { NotFoundError } = require('../errors/notFoundError');
-const { UnauthorizedError } = require('../errors/unauthorizedError');
+const { BadRequestError } = require('../errors/badRequestError');
 const { STATUS_CODE } = require('../utils/STATUS_CODE');
 const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
 
@@ -112,20 +112,43 @@ const updateAvatar = (req, res) => {
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password, res)
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? SECRET_KEY : 'dev-secret', { expiresIn: '7d' });
-      res.cookie('jwt', token, {
-        httpOnly: true,
-        sameSite: true,
-      })
-        .status(200).send({ token });
+      // создадим токен
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? SECRET_KEY : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+
+      res
+        .cookie('jwt', token, {
+          httpOnly: true,
+          sameSite: true,
+        })
+        .json({ token })
+        .end();
     })
-    .catch(() => new UnauthorizedError(STATUS_MESSAGE.WRONG_LOGIN_DATA_MESSAGE));
+    .catch(next);
+};
+
+const getUserInfo = async (req, res, next) => {
+  try {
+    const user = await User.findOne(req.user)
+      .orFail(new NotFoundError(STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE));
+    res.send({ data: user });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      next(new BadRequestError(STATUS_MESSAGE.WRONG_ID_MESSAGE));
+    } else {
+      next(err);
+    }
+  }
 };
 
 module.exports = {
-  getUsers, getUserById, createUser, updateProfile, updateAvatar, login,
+  getUsers, getUserById, createUser, updateProfile, updateAvatar, login, getUserInfo,
 };
