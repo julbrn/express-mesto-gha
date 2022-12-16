@@ -120,7 +120,7 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        return Promise.reject(new NotFoundError(STATUS_MESSAGE));
+        throw new NotFoundError(STATUS_MESSAGE);
       }
       const token = jwt.sign(
         { _id: user._id },
