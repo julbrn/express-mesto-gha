@@ -18,9 +18,7 @@ const { validateSignup, validateSignin } = require('./middlewares/celebrate');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-});
+mongoose.connect(process.env.DATABASE_LINK);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,8 +27,8 @@ app.use(helmet());
 
 // при добавлении переменных в .env не проходит тесты, не получилось выполнить :(
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: process.env.MAX_REQUEST_WINDOW,
+  max: process.env.MAX_REQUEST_LIMIT,
 });
 
 app.use(limiter);
