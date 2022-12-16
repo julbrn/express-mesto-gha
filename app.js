@@ -1,4 +1,6 @@
 require('dotenv').config();
+
+console.log(process.env.DATABASE_LINK);
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -18,7 +20,15 @@ const { validateSignup, validateSignin } = require('./middlewares/celebrate');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect(process.env.DATABASE_LINK);
+// К сожалению, предложенная реализвация не проходит автотесты. Может быть, что-то не делаю.
+// Добавила в файл .env переменные
+// и доставала их в app.js из process.env. Локально всё работет, а тесты не проходит: "Исправьте
+// ошибки в коде:
+// 1. URI в файле app.js для подключения к mongodb не найден. Пример правильного URI: mongodb://localhost:27017/mestodb"
+
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,8 +37,8 @@ app.use(helmet());
 
 // при добавлении переменных в .env не проходит тесты, не получилось выполнить :(
 const limiter = rateLimit({
-  windowMs: process.env.MAX_REQUEST_WINDOW,
-  max: process.env.MAX_REQUEST_LIMIT,
+  windowMs: 15 * 60 * 1000,
+  max: 100,
 });
 
 app.use(limiter);
