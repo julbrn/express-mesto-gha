@@ -18,7 +18,7 @@ const { validateSignup, validateSignin } = require('./middlewares/celebrate');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect(process.env.DATABASE_LINK, {
+mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
