@@ -5,23 +5,21 @@ const { BadRequestError } = require('../errors/badRequestError');
 const { STATUS_CODE } = require('../utils/STATUS_CODE');
 const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
 
-const getCards = (req, res) => Card.find({})
+const getCards = (req, res, next) => Card.find({})
   .then((cards) => res.send(cards))
-  .catch(() => res.status(STATUS_CODE.SERVER_ERROR_CODE)
-    .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE }));
+  .catch(next);
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_CODE.BAD_REQUEST_CODE)
-          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
+        res.status(STATUS_CODE.BAD_REQUEST_CODE);
+        next(new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE));
       } else {
-        res.status(STATUS_CODE.SERVER_ERROR_CODE)
-          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
@@ -49,43 +47,33 @@ const deleteCard = (req, res, next) => {
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).orFail(new NotFoundError())
+  ).orFail(new NotFoundError(STATUS_MESSAGE.NONEXISTENT_CARD_MESSAGE))
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(STATUS_CODE.NOT_FOUND_CODE)
-          .send({ message: STATUS_MESSAGE.NONEXISTENT_CARD_MESSAGE });
-      } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.BAD_REQUEST_CODE)
-          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
+      if (err.name === 'CastError') {
+        throw new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE);
       } else {
-        res.status(STATUS_CODE.SERVER_ERROR_CODE)
-          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
-  ).orFail(new NotFoundError())
+  ).orFail(new NotFoundError(STATUS_MESSAGE.NONEXISTENT_CARD_MESSAGE))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(STATUS_CODE.NOT_FOUND_CODE)
-          .send({ message: STATUS_MESSAGE.NONEXISTENT_CARD_MESSAGE });
-      } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.BAD_REQUEST_CODE)
-          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
+      if (err.name === 'CastError') {
+        throw new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE);
       } else {
-        res.status(STATUS_CODE.SERVER_ERROR_CODE)
-          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
