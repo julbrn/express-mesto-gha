@@ -26,7 +26,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
-const limiter = rateLimit(JSON.parse(process.env.RATE_LIMITER));
+const limiter = rateLimit({
+  windowMs: process.env.MAX_REQUEST_WINDOW,
+  max: process.env.MAX_REQUEST_LIMIT,
+});
 
 app.use(limiter);
 
