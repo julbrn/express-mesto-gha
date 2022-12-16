@@ -26,9 +26,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
+
+// при добавлении переменных в .env не проходит тесты, не получилось выполнить :(
 const limiter = rateLimit({
-  windowMs: process.env.MAX_REQUEST_WINDOW,
-  max: process.env.MAX_REQUEST_LIMIT,
+  windowMs: 15 * 60 * 1000,
+  max: 100,
 });
 
 app.use(limiter);
