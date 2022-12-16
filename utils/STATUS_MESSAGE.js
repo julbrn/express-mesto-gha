@@ -8,7 +8,7 @@ const STATUS_MESSAGE = {
   CONFLICT_MESSAGE: 'Пользователь с таким email уже существует.',
   PAGE_NOT_FOUND_MESSAGE: 'Запрашиваемый ресурс не найден.',
   UNAUTHORIZED_CARD_DELETION_MESSAGE: 'Запрашиваемый ресурс не найден.',
-  UNAUTHORIZED_MESSAGE: 'Необходима авторизация',
+  UNAUTHORIZED_MESSAGE: 'Требуется авторизация',
 };
 
 module.exports = {

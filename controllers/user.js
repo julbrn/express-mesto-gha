@@ -7,31 +7,22 @@ const User = require('../models/user');
 const { NotFoundError } = require('../errors/notFoundError');
 const { BadRequestError } = require('../errors/badRequestError');
 const { ConflictError } = require('../errors/conflictError');
-const { STATUS_CODE } = require('../utils/STATUS_CODE');
 const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ users }))
-    .catch(() => res.status(STATUS_CODE.SERVER_ERROR_CODE)
-      .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE }));
+    .catch(next);
 };
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new NotFoundError())
+    .orFail(new NotFoundError(STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE))
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(STATUS_CODE.NOT_FOUND_CODE).send({
-          message: 'Пользователь с указанным id не'
-            + ' найден.',
-        });
-      } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.BAD_REQUEST_CODE)
-          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
+      if (err.name === 'CastError') {
+        next(new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE));
       } else {
-        res.status(STATUS_CODE.SERVER_ERROR_CODE)
-          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
@@ -67,46 +58,36 @@ const createUser = (req, res, next) => {
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .orFail(new NotFoundError())
+    .orFail(new NotFoundError(STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_CODE.BAD_REQUEST_CODE)
-          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
+        next(new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE));
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.NOT_FOUND_CODE).send({
-          message: STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE,
-        });
+        next(new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE));
       } else {
-        res.status(STATUS_CODE.SERVER_ERROR_CODE)
-          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
     runValidators: true,
-  }).orFail(new NotFoundError())
+  }).orFail(new NotFoundError(STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_CODE.BAD_REQUEST_CODE)
-          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
+        next(new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE));
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.NOT_FOUND_CODE)
-          .send({
-            message: 'Пользователь с указанным id не'
-              + ' найден',
-          });
+        next(new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE));
       } else {
-        res.status(STATUS_CODE.SERVER_ERROR_CODE)
-          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
