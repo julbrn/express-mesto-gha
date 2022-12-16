@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { NotFoundError } = require('../errors/notFoundError');
 const { BadRequestError } = require('../errors/badRequestError');
+const { ConflictError } = require('../errors/conflictError');
 const { STATUS_CODE } = require('../utils/STATUS_CODE');
 const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
 
@@ -35,7 +36,7 @@ const getUserById = (req, res) => {
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -60,9 +61,10 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(STATUS_CODE.INCORRECT_DATA_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
+      } else if (err.code === 11000) {
+        next(new ConflictError(STATUS_MESSAGE.CONFLICT_MESSAGE));
       } else {
-        res.status(STATUS_CODE.SERVER_ERROR_CODE)
-          .send({ message: STATUS_MESSAGE.SERVER_ERROR_MESSAGE });
+        next(err);
       }
     });
 };
@@ -118,7 +120,7 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Нет пользователя с таким id');
+        return Promise.reject(new NotFoundError(STATUS_MESSAGE));
       }
       const token = jwt.sign(
         { _id: user._id },
@@ -131,20 +133,23 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const getUserInfo = async (req, res, next) => {
-  try {
-    const user = await User.findOne(req.user)
-      .orFail(new NotFoundError(STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE));
-    res.send({ data: user });
-  } catch (err) {
-    if (err.name === 'CastError') {
-      next(new BadRequestError(STATUS_MESSAGE.WRONG_ID_MESSAGE));
-    } else {
-      next(err);
-    }
-  }
+const getMyInfo = (req, res, id, next) => {
+  User.findById(id) // user._id добавляем в пейлоад в миддлваре auth
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError(STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE);
+      }
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError(STATUS_MESSAGE.WRONG_ID_MESSAGE));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {
-  getUsers, getUserById, createUser, updateProfile, updateAvatar, login, getUserInfo,
+  getUsers, getUserById, createUser, updateProfile, updateAvatar, login, getMyInfo,
 };

@@ -5,6 +5,7 @@ const STATUS_MESSAGE = {
   NONEXISTENT_USER_MESSAGE: 'Такой пользователь не найден.',
   WRONG_LOGIN_DATA_MESSAGE: 'Неправильные почта или пароль.',
   WRONG_ID_MESSAGE: 'Передан некорректный id пользователя.',
+  CONFLICT_MESSAGE: 'Пользователь с таким email уже существует.',
 };
 
 module.exports = {

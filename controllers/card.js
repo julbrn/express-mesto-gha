@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 const { NotFoundError } = require('../errors/notFoundError');
+const { ForbiddenError } = require('../errors/forbiddenError');
 const { STATUS_CODE } = require('../utils/STATUS_CODE');
 const { STATUS_MESSAGE } = require('../utils/STATUS_MESSAGE');
 
@@ -25,9 +26,14 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  const card = Card.findByIdAndRemove(req.params.cardId)
     .orFail(new NotFoundError())
-    .then((cards) => res.send(cards))
+    .then((cards) => {
+      if (card.owner._id.toString() !== req.user._id) {
+        throw new ForbiddenError('Пользователь не имеет прав на удаления чужой карточки.');
+      }
+      res.send(cards);
+    })
     .catch((err) => {
       if (err.name === 'NotFound') {
         res.status(STATUS_CODE.NOTFOUND_CODE)
