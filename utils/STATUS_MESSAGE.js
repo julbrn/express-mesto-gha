@@ -6,6 +6,9 @@ const STATUS_MESSAGE = {
   WRONG_LOGIN_DATA_MESSAGE: 'Неправильные почта или пароль.',
   WRONG_ID_MESSAGE: 'Передан некорректный id пользователя.',
   CONFLICT_MESSAGE: 'Пользователь с таким email уже существует.',
+  PAGE_NOT_FOUND_MESSAGE: 'Запрашиваемый ресурс не найден.',
+  UNAUTHORIZED_CARD_DELETION_MESSAGE: 'Запрашиваемый ресурс не найден.',
+  UNAUTHORIZED_MESSAGE: 'Необходима авторизация',
 };
 
 module.exports = {

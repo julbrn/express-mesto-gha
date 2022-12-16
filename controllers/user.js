@@ -22,12 +22,12 @@ const getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(STATUS_CODE.NOTFOUND_CODE).send({
+        res.status(STATUS_CODE.NOT_FOUND_CODE).send({
           message: 'Пользователь с указанным id не'
             + ' найден.',
         });
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+        res.status(STATUS_CODE.BAD_REQUEST_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else {
         res.status(STATUS_CODE.SERVER_ERROR_CODE)
@@ -58,14 +58,12 @@ const createUser = (req, res, next) => {
       },
     }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
-          .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
-      } else if (err.code === 11000) {
+      if (err.code === 11000) {
         next(new ConflictError(STATUS_MESSAGE.CONFLICT_MESSAGE));
-      } else {
-        next(err);
+      } else if (err.name === 'ValidationError') {
+        next(new BadRequestError(STATUS_MESSAGE.INCORRECT_DATA_MESSAGE));
       }
+      return next(err);
     });
 };
 
@@ -76,12 +74,11 @@ const updateProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+        res.status(STATUS_CODE.BAD_REQUEST_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.NOTFOUND_CODE).send({
-          message: 'Пользователь с указанным id не'
-            + ' найден',
+        res.status(STATUS_CODE.NOT_FOUND_CODE).send({
+          message: STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE,
         });
       } else {
         res.status(STATUS_CODE.SERVER_ERROR_CODE)
@@ -99,10 +96,10 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+        res.status(STATUS_CODE.BAD_REQUEST_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.NOTFOUND_CODE)
+        res.status(STATUS_CODE.NOT_FOUND_CODE)
           .send({
             message: 'Пользователь с указанным id не'
               + ' найден',

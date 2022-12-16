@@ -10,7 +10,8 @@ const auth = require('./middlewares/auth');
 const usersRoute = require('./routes/users');
 const cardsRoute = require('./routes/cards');
 const { login, createUser } = require('./controllers/user');
-const { NOTFOUND_CODE } = require('./utils/STATUS_CODE');
+const { NotFoundError } = require('./errors/notFoundError');
+const { STATUS_MESSAGE } = require('./utils/STATUS_MESSAGE');
 const errorHandler = require('./middlewares/errorHandler');
 const { validateSignup, validateSignin } = require('./middlewares/celebrate');
 
@@ -35,12 +36,12 @@ app.use(limiter);
 
 app.post('/signin', validateSignin, login);
 app.post('/signup', validateSignup, createUser);
+app.use('/', (req, res, next) => {
+  next(new NotFoundError(STATUS_MESSAGE.PAGE_NOT_FOUND_MESSAGE));
+});
 app.use(auth);
 app.use('/', usersRoute);
 app.use('/', cardsRoute);
-app.use((req, res) => {
-  res.status(NOTFOUND_CODE).send({ message: 'Запрашиваемый ресурс не найден' });
-});
 
 app.use(errors());
 app.use(errorHandler);

@@ -16,7 +16,7 @@ const createCard = (req, res) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+        res.status(STATUS_CODE.BAD_REQUEST_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else {
         res.status(STATUS_CODE.SERVER_ERROR_CODE)
@@ -30,16 +30,16 @@ const deleteCard = (req, res) => {
     .orFail(new NotFoundError())
     .then((cards) => {
       if (card.owner._id.toString() !== req.user._id) {
-        throw new ForbiddenError('Пользователь не имеет прав на удаления чужой карточки.');
+        throw new ForbiddenError(STATUS_MESSAGE.UNAUTHORIZED_CARD_DELETION_MESSAGE);
       }
       res.send(cards);
     })
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(STATUS_CODE.NOTFOUND_CODE)
+        res.status(STATUS_CODE.NOT_FOUND_CODE)
           .send({ message: STATUS_MESSAGE.NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+        res.status(STATUS_CODE.BAD_REQUEST_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else {
         res.status(STATUS_CODE.SERVER_ERROR_CODE)
@@ -57,10 +57,10 @@ const likeCard = (req, res) => {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(STATUS_CODE.NOTFOUND_CODE)
+        res.status(STATUS_CODE.NOT_FOUND_CODE)
           .send({ message: STATUS_MESSAGE.NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+        res.status(STATUS_CODE.BAD_REQUEST_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else {
         res.status(STATUS_CODE.SERVER_ERROR_CODE)
@@ -77,10 +77,10 @@ const dislikeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'NotFound') {
-        res.status(STATUS_CODE.NOTFOUND_CODE)
+        res.status(STATUS_CODE.NOT_FOUND_CODE)
           .send({ message: STATUS_MESSAGE.NONEXISTENT_CARD_MESSAGE });
       } else if (err.name === 'CastError') {
-        res.status(STATUS_CODE.INCORRECT_DATA_CODE)
+        res.status(STATUS_CODE.BAD_REQUEST_CODE)
           .send({ message: STATUS_MESSAGE.INCORRECT_DATA_MESSAGE });
       } else {
         res.status(STATUS_CODE.SERVER_ERROR_CODE)
