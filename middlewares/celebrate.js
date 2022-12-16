@@ -22,7 +22,7 @@ const validateSignup = celebrate({
         .min(2)
         .max(30),
       avatar: Joi.string()
-        .pattern(/^https?:\/\/(www\.)?[\w\-_~:\/#\[\]@!&',;=]+\.[\w\-_~:\/#\[\]@!&',;=а-я]+#?/i),
+        .pattern(/^https?:\/\/(www\.)?[\w\-_~:/#[\]@!&',;=]+\.[\w\-_~:/#[\]@!&',;=а-я]+#?/i),
       email: Joi.string()
         .min(3)
         .required()

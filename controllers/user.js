@@ -117,20 +117,16 @@ const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      // создадим токен
+      if (!user) {
+        throw new NotFoundError('Нет пользователя с таким id');
+      }
       const token = jwt.sign(
         { _id: user._id },
         NODE_ENV === 'production' ? SECRET_KEY : 'dev-secret',
         { expiresIn: '7d' },
       );
 
-      res
-        .cookie('jwt', token, {
-          httpOnly: true,
-          sameSite: true,
-        })
-        .json({ token })
-        .end();
+      res.send({ token });
     })
     .catch(next);
 };
