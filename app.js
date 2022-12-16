@@ -18,7 +18,7 @@ const { validateSignup, validateSignin } = require('./middlewares/celebrate');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(process.env.DATABASE_LINK, {
   useNewUrlParser: true,
 });
 
@@ -26,10 +26,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-});
+const limiter = rateLimit(JSON.parse(process.env.RATE_LIMITER));
 
 app.use(limiter);
 
