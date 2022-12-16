@@ -13,9 +13,8 @@ const {
 } = require('../middlewares/celebrate');
 
 user.get('/users', getUsers);
-user.get('users/me', getMyInfo);
+user.get('/users/me', getMyInfo);
 user.get('/users/:userId', validateUserId, getUserById);
-// user.post('/users', createUser);
 user.patch('/users/me', validateProfileUpdate, updateProfile);
 user.patch('/users/me/avatar', validateAvatarUpdate, updateAvatar);
 module.exports = user;

@@ -130,13 +130,13 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const getMyInfo = (req, res, id, next) => {
-  User.findById(id) // user._id добавляем в пейлоад в миддлваре auth
+const getMyInfo = (req, res, next) => {
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(STATUS_MESSAGE.NONEXISTENT_USER_MESSAGE);
       }
-      res.send({ data: user });
+      res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
