@@ -31,7 +31,6 @@ const limiter = rateLimit({
   max: 100,
 });
 
-// подключаем rate-limiter
 app.use(limiter);
 
 app.post('/signin', validateSignin, login);
@@ -39,12 +38,7 @@ app.post('/signup', validateSignup, createUser);
 
 app.use('/', auth, usersRoute);
 app.use('/', auth, cardsRoute);
-// app.use('/', (req, res, next) => {
-//   next(new NotFoundError(STATUS_MESSAGE.PAGE_NOT_FOUND_MESSAGE));
-// });
-// app.all('/*', (req, res) => {
-//   res.status(404).send({ message: STATUS_MESSAGE.PAGE_NOT_FOUND_MESSAGE });
-// });
+
 app.use('*', () => {
   throw new NotFoundError(STATUS_MESSAGE.PAGE_NOT_FOUND_MESSAGE);
 });
